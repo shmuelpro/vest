@@ -9,27 +9,30 @@ describe('Shape validation', () => {
       expect(
         shape(
           { name: 99 },
+          {},
           {
             name: enforce.isString(),
           }
-        )
+        ).pass
       ).toBe(false);
       expect(
         shape(
           { count: 500 },
+          {},
           {
             count: enforce.isBetween(10, 20),
           }
-        )
+        ).pass
       ).toBe(false);
       expect(
         shape(
           { count: 500, isOnline: true },
+          {},
           {
             count: enforce.equals(500),
             isOnline: enforce.equals(false),
           }
-        )
+        ).pass
       ).toBe(false);
     });
 
@@ -37,27 +40,30 @@ describe('Shape validation', () => {
       expect(
         shape(
           { name: '99' },
+          {},
           {
             name: enforce.isString(),
           }
-        )
+        ).pass
       ).toBe(true);
       expect(
         shape(
           { count: 500 },
+          {},
           {
             count: enforce.isBetween(400, 600),
           }
-        )
+        ).pass
       ).toBe(true);
       expect(
         shape(
           { count: 500, isOnline: true },
+          {},
           {
             count: enforce.equals(500),
             isOnline: enforce.equals(true),
           }
-        )
+        ).pass
       ).toBe(true);
     });
 
@@ -67,20 +73,22 @@ describe('Shape validation', () => {
           {
             friendCount: 200,
           },
+          {},
           {
             friendCount: enforce.isNumber().greaterThan(150).equals(200),
           }
-        )
+        ).pass
       ).toBe(true);
       expect(
         shape(
           {
             friendCount: 200,
           },
+          {},
           {
             friendCount: enforce.isNumber().greaterThan(150).equals(300),
           }
-        )
+        ).pass
       ).toBe(false);
     });
   });
@@ -101,6 +109,7 @@ describe('Shape validation', () => {
               },
             },
           },
+          {},
           {
             user: enforce.shape({
               id: enforce.equals('000'),
@@ -113,7 +122,7 @@ describe('Shape validation', () => {
               }),
             }),
           }
-        )
+        ).pass
       ).toBe(true);
       expect(
         shape(
@@ -129,6 +138,7 @@ describe('Shape validation', () => {
               },
             },
           },
+          {},
           {
             user: enforce.shape({
               id: enforce.equals('000'),
@@ -141,7 +151,7 @@ describe('Shape validation', () => {
               }),
             }),
           }
-        )
+        ).pass
       ).toBe(false);
     });
   });
@@ -151,14 +161,16 @@ describe('Shape validation', () => {
       expect(
         shape(
           { user: 'example', password: 'x123' },
+          {},
           { user: enforce.isString(), password: enforce.endsWith('23') }
-        )
+        ).pass
       ).toBe(true);
       expect(
         shape(
           { user: 'example', password: 'x123' },
+          {},
           { user: enforce.isString() }
-        )
+        ).pass
       ).toBe(false);
     });
   });
@@ -168,16 +180,16 @@ describe('Shape validation', () => {
       expect(
         shape(
           { user: 'example', password: 'x123' },
-          { user: enforce.isString(), password: enforce.endsWith('23') },
-          { loose: true }
-        )
+          { loose: true },
+          { user: enforce.isString(), password: enforce.endsWith('23') }
+        ).pass
       ).toBe(true);
       expect(
         shape(
           { user: 'example', password: 'x123' },
-          { user: enforce.isString() },
-          { loose: true }
-        )
+          { loose: true },
+          { user: enforce.isString() }
+        ).pass
       ).toBe(true);
     });
   });
@@ -187,17 +199,18 @@ describe('Shape validation', () => {
       expect(
         shape(
           { user: 'example' },
+          {},
           { user: enforce.isString(), password: enforce.startsWith('x') }
-        )
+        ).pass
       ).toBe(false);
     });
     it('Should fail even with loose', () => {
       expect(
         shape(
           { user: 'example' },
-          { user: enforce.isString(), password: enforce.startsWith('x') },
-          { loose: true }
-        )
+          { loose: true },
+          { user: enforce.isString(), password: enforce.startsWith('x') }
+        ).pass
       ).toBe(false);
     });
   });
@@ -207,22 +220,25 @@ describe('Shape validation', () => {
       expect(
         loose(
           { user: 'example', password: 'x123' },
+          {},
           { user: enforce.isString(), password: enforce.endsWith('23') }
-        )
+        ).pass
       ).toBe(true);
       expect(
         loose(
           { user: 'example', password: 'x123' },
+          {},
           { user: enforce.isString() }
-        )
+        ).pass
       ).toBe(true);
     });
     it('Should fail even with loose', () => {
       expect(
         loose(
           { user: 'example' },
+          {},
           { user: enforce.isString(), password: enforce.startsWith('x') }
-        )
+        ).pass
       ).toBe(false);
     });
   });
@@ -232,12 +248,13 @@ describe('Shape validation', () => {
       expect(
         shape(
           { user: 'example', confirm: 'example' },
+          {},
           {
             user: enforce.isString(),
             password: enforce.optional(),
             confirm: enforce.optional(),
           }
-        )
+        ).pass
       ).toBe(true);
     });
 
@@ -245,22 +262,24 @@ describe('Shape validation', () => {
       expect(
         shape(
           { user: 'example', confirm: undefined },
+          {},
           {
             user: enforce.isString(),
             confirm: enforce.optional(),
           }
-        )
+        ).pass
       ).toBe(true);
     });
     it('Should allow optional fields to be null', () => {
       expect(
         shape(
           { user: 'example', confirm: null },
+          {},
           {
             user: enforce.isString(),
             confirm: enforce.optional(),
           }
-        )
+        ).pass
       ).toBe(true);
     });
 
@@ -268,6 +287,7 @@ describe('Shape validation', () => {
       expect(
         shape(
           { user: 'example', nickname: '1111' },
+          {},
           {
             user: enforce.isString(),
             nickname: enforce.optional(
@@ -275,7 +295,7 @@ describe('Shape validation', () => {
               enforce.isNotNumeric()
             ),
           }
-        )
+        ).pass
       ).toBe(false);
     });
   });
@@ -376,27 +396,34 @@ describe('Shape validation', () => {
           shoeSize: 3,
           username: faker.internet.userName(),
         },
-      }).loose(shapeRules({ loose: true }));
+      }).loose(looseRules());
     });
   });
 });
 
-const shapeRules = options => ({
-  user: enforce.shape(
-    {
-      age: enforce.isNumber().isBetween(0, 10),
-      friends: enforce.optional(enforce.isArray()),
-      id: enforce.isString(),
-      name: enforce.shape(
-        {
-          first: enforce.isString(),
-          last: enforce.isString(),
-          middle: enforce.optional(enforce.isString()),
-        },
-        options
-      ),
-      username: enforce.isString(),
-    },
-    options
-  ),
+const looseRules = () => ({
+  user: enforce.loose({
+    age: enforce.isNumber().isBetween(0, 10),
+    friends: enforce.optional(enforce.isArray()),
+    id: enforce.isString(),
+    name: enforce.loose({
+      first: enforce.isString(),
+      last: enforce.isString(),
+      middle: enforce.optional(enforce.isString()),
+    }),
+    username: enforce.isString(),
+  }),
+});
+const shapeRules = () => ({
+  user: enforce.shape({
+    age: enforce.isNumber().isBetween(0, 10),
+    friends: enforce.optional(enforce.isArray()),
+    id: enforce.isString(),
+    name: enforce.shape({
+      first: enforce.isString(),
+      last: enforce.isString(),
+      middle: enforce.optional(enforce.isString()),
+    }),
+    username: enforce.isString(),
+  }),
 });

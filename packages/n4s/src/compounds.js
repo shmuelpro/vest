@@ -12,5 +12,5 @@ export default {
   loose,
   oneOf,
   optional,
-  shape
+  shape,
 };

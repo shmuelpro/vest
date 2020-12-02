@@ -1,3 +1,5 @@
+import isCompound from 'isCompound';
+
 import { transformResult } from 'transformResult';
 
 /**
@@ -11,7 +13,9 @@ import { transformResult } from 'transformResult';
 function runner(rule, value, args) {
   // spreading here instead of passing rest params because of significant bundle size impact
   const ruleResult = rule(value, ...(args || []));
-  const result = transformResult(ruleResult, { rule, value });
+  const result = isCompound(rule)
+    ? ruleResult
+    : transformResult(ruleResult, { rule, value });
   if (!result.pass) {
     throw new Error(result.message);
   }

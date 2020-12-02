@@ -6,10 +6,10 @@ import genRuleProxy from 'genRuleProxy';
 import runtimeRules from 'runtimeRules';
 import withArgs from 'withArgs';
 
-const Enforce = value => {
+const Enforce = (value, options = {}) => {
   const proxy = genRuleProxy({}, ruleName =>
     withArgs(args => {
-      runner(runtimeRules[ruleName], value, args);
+      runner(runtimeRules[ruleName], value, [options].concat(args));
       return proxy;
     })
   );

@@ -19,5 +19,8 @@ export default function withAgs(cb, fnName) {
  * @param {Function} cb
  */
 export function withFirst(cb) {
-  return withAgs(args => cb(args[0], args.slice(1)), cb.name);
+  return withAgs(args => {
+    const right = args.splice(cb.length - 1);
+    return cb.apply(null, args.concat([right]));
+  }, cb.name);
 }
