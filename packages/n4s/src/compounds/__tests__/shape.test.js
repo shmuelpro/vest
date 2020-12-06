@@ -7,88 +7,72 @@ describe('Shape validation', () => {
   describe('Base behavior', () => {
     it('Should fail when encountered a mis-shapen property', () => {
       expect(
-        shape(
-          { name: 99 },
-          {},
-          {
+        enforce
+          .shape({
             name: enforce.isString(),
-          }
-        ).pass
+          })
+          .test({ name: 99 }).pass
       ).toBe(false);
       expect(
-        shape(
-          { count: 500 },
-          {},
-          {
+        enforce
+          .shape({
             count: enforce.isBetween(10, 20),
-          }
-        ).pass
+          })
+          .test({ count: 500 }).pass
       ).toBe(false);
       expect(
-        shape(
-          { count: 500, isOnline: true },
-          {},
-          {
+        enforce
+          .shape({
             count: enforce.equals(500),
             isOnline: enforce.equals(false),
-          }
-        ).pass
+          })
+          .test({ count: 500, isOnline: true }).pass
       ).toBe(false);
     });
 
     it('Should pass when no mis-shapen property', () => {
       expect(
-        shape(
-          { name: '99' },
-          {},
-          {
+        enforce
+          .shape({
             name: enforce.isString(),
-          }
-        ).pass
+          })
+          .test({ name: '99' }).pass
       ).toBe(true);
       expect(
-        shape(
-          { count: 500 },
-          {},
-          {
+        enforce
+          .shape({
             count: enforce.isBetween(400, 600),
-          }
-        ).pass
+          })
+          .test({ count: 500 }).pass
       ).toBe(true);
       expect(
-        shape(
-          { count: 500, isOnline: true },
-          {},
-          {
+        enforce
+          .shape({
             count: enforce.equals(500),
             isOnline: enforce.equals(true),
-          }
-        ).pass
+          })
+          .test({ count: 500, isOnline: true }).pass
       ).toBe(true);
     });
 
     it('Allows multiple enforcements per field', () => {
       expect(
-        shape(
-          {
-            friendCount: 200,
-          },
-          {},
-          {
+        enforce
+          .shape({
             friendCount: enforce.isNumber().greaterThan(150).equals(200),
-          }
-        ).pass
+          })
+          .test({
+            friendCount: 200,
+          }).pass
       ).toBe(true);
       expect(
-        shape(
-          {
-            friendCount: 200,
-          },
-          {},
-          {
+        enforce
+          .shape({
             friendCount: enforce.isNumber().greaterThan(150).equals(300),
-          }
-        ).pass
+          })
+          .test({
+            friendCount: 200,
+          }).pass
       ).toBe(false);
     });
   });
@@ -96,8 +80,20 @@ describe('Shape validation', () => {
   describe('shape nesting', () => {
     it('Should allow deeply nested shape calls', () => {
       expect(
-        shape(
-          {
+        enforce
+          .shape({
+            user: enforce.shape({
+              id: enforce.equals('000'),
+              details: enforce.shape({
+                age: enforce.isNumber(),
+                name: enforce.shape({
+                  first: enforce.isString(),
+                  last: enforce.isString(),
+                }),
+              }),
+            }),
+          })
+          .test({
             user: {
               id: '000',
               details: {
@@ -108,9 +104,11 @@ describe('Shape validation', () => {
                 },
               },
             },
-          },
-          {},
-          {
+          }).pass
+      ).toBe(true);
+      expect(
+        enforce
+          .shape({
             user: enforce.shape({
               id: enforce.equals('000'),
               details: enforce.shape({
@@ -121,12 +119,8 @@ describe('Shape validation', () => {
                 }),
               }),
             }),
-          }
-        ).pass
-      ).toBe(true);
-      expect(
-        shape(
-          {
+          })
+          .test({
             user: {
               id: '000',
               details: {
@@ -137,21 +131,7 @@ describe('Shape validation', () => {
                 },
               },
             },
-          },
-          {},
-          {
-            user: enforce.shape({
-              id: enforce.equals('000'),
-              details: enforce.shape({
-                age: enforce.isNumber(),
-                name: enforce.shape({
-                  first: enforce.isString(),
-                  last: enforce.isString(),
-                }),
-              }),
-            }),
-          }
-        ).pass
+          }).pass
       ).toBe(false);
     });
   });
@@ -159,18 +139,14 @@ describe('Shape validation', () => {
   describe('When field is in data but not in shape', () => {
     it('Should fail', () => {
       expect(
-        shape(
-          { user: 'example', password: 'x123' },
-          {},
-          { user: enforce.isString(), password: enforce.endsWith('23') }
-        ).pass
+        enforce
+          .shape({ user: enforce.isString(), password: enforce.endsWith('23') })
+          .test({ user: 'example', password: 'x123' }).pass
       ).toBe(true);
       expect(
-        shape(
-          { user: 'example', password: 'x123' },
-          {},
-          { user: enforce.isString() }
-        ).pass
+        enforce
+          .shape({ user: enforce.isString() })
+          .test({ user: 'example', password: 'x123' }).pass
       ).toBe(false);
     });
   });
@@ -178,18 +154,17 @@ describe('Shape validation', () => {
   describe('When field is in data but not in shape with loose option', () => {
     it('Should succeed', () => {
       expect(
-        shape(
-          { user: 'example', password: 'x123' },
-          { loose: true },
-          { user: enforce.isString(), password: enforce.endsWith('23') }
-        ).pass
+        enforce
+          .shape(
+            { user: enforce.isString(), password: enforce.endsWith('23') },
+            { loose: true }
+          )
+          .test({ user: 'example', password: 'x123' }).pass
       ).toBe(true);
       expect(
-        shape(
-          { user: 'example', password: 'x123' },
-          { loose: true },
-          { user: enforce.isString() }
-        ).pass
+        enforce
+          .shape({ user: enforce.isString() }, { loose: true })
+          .test({ user: 'example', password: 'x123' }).pass
       ).toBe(true);
     });
   });
@@ -197,20 +172,22 @@ describe('Shape validation', () => {
   describe('When field is in shape but not in data', () => {
     it('Should fail', () => {
       expect(
-        shape(
-          { user: 'example' },
-          {},
-          { user: enforce.isString(), password: enforce.startsWith('x') }
-        ).pass
+        enforce
+          .shape({
+            user: enforce.isString(),
+            password: enforce.startsWith('x'),
+          })
+          .test({ user: 'example' }).pass
       ).toBe(false);
     });
     it('Should fail even with loose', () => {
       expect(
-        shape(
-          { user: 'example' },
-          { loose: true },
-          { user: enforce.isString(), password: enforce.startsWith('x') }
-        ).pass
+        enforce
+          .shape(
+            { user: enforce.isString(), password: enforce.startsWith('x') },
+            { loose: true }
+          )
+          .test({ user: 'example' }).pass
       ).toBe(false);
     });
   });
@@ -218,27 +195,28 @@ describe('Shape validation', () => {
   describe('Behavior of loose compared to shape', () => {
     it('Should succeed', () => {
       expect(
-        loose(
-          { user: 'example', password: 'x123' },
-          {},
-          { user: enforce.isString(), password: enforce.endsWith('23') }
-        ).pass
+        enforce
+          .loose({
+            user: enforce.isString(),
+            password: enforce.endsWith('23'),
+          })
+          .test({ user: 'example', password: 'x123' }).pass
       ).toBe(true);
       expect(
-        loose(
-          { user: 'example', password: 'x123' },
-          {},
-          { user: enforce.isString() }
-        ).pass
+        enforce.loose({ user: enforce.isString() }).test({
+          user: 'example',
+          password: 'x123',
+        }).pass
       ).toBe(true);
     });
     it('Should fail even with loose', () => {
       expect(
-        loose(
-          { user: 'example' },
-          {},
-          { user: enforce.isString(), password: enforce.startsWith('x') }
-        ).pass
+        enforce
+          .loose({
+            user: enforce.isString(),
+            password: enforce.startsWith('x'),
+          })
+          .test({ user: 'example' }).pass
       ).toBe(false);
     });
   });
@@ -246,56 +224,48 @@ describe('Shape validation', () => {
   describe('Handling of optional fields', () => {
     it('Should allow optional fields to not be defined', () => {
       expect(
-        shape(
-          { user: 'example', confirm: 'example' },
-          {},
-          {
+        enforce
+          .shape({
             user: enforce.isString(),
             password: enforce.optional(),
             confirm: enforce.optional(),
-          }
-        ).pass
+          })
+          .test({ user: 'example', confirm: 'example' }).pass
       ).toBe(true);
     });
 
     it('Should allow optional fields to be undefined', () => {
       expect(
-        shape(
-          { user: 'example', confirm: undefined },
-          {},
-          {
+        enforce
+          .shape({
             user: enforce.isString(),
             confirm: enforce.optional(),
-          }
-        ).pass
+          })
+          .test({ user: 'example', confirm: undefined }).pass
       ).toBe(true);
     });
     it('Should allow optional fields to be null', () => {
       expect(
-        shape(
-          { user: 'example', confirm: null },
-          {},
-          {
+        enforce
+          .shape({
             user: enforce.isString(),
             confirm: enforce.optional(),
-          }
-        ).pass
+          })
+          .test({ user: 'example', confirm: null }).pass
       ).toBe(true);
     });
 
     it('enforces rules on optional when value is defined', () => {
       expect(
-        shape(
-          { user: 'example', nickname: '1111' },
-          {},
-          {
+        enforce
+          .shape({
             user: enforce.isString(),
             nickname: enforce.optional(
               enforce.isString(),
               enforce.isNotNumeric()
             ),
-          }
-        ).pass
+          })
+          .test({ user: 'example', nickname: '1111' }).pass
       ).toBe(false);
     });
   });
