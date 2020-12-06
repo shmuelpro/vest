@@ -56,10 +56,10 @@ describe('enforce.template', () => {
         enforce.isOdd()
       );
 
-      expect(x.test(10)).toBe(false);
-      expect(x.test('90')).toBe(false);
-      expect(y.test(true)).toBe(false);
-      expect(x.test('90')).toBe(false);
+      expect(x.test(10).pass).toBe(false);
+      expect(x.test('90').pass).toBe(false);
+      expect(y.test(true).pass).toBe(false);
+      expect(x.test('90').pass).toBe(false);
     });
     it('Should return `true` when valid', () => {
       const x = enforce.template(enforce.isNumber().greaterThan(50));
@@ -68,8 +68,8 @@ describe('enforce.template', () => {
         enforce.isOdd()
       );
 
-      expect(x.test(51)).toBe(true);
-      expect(y.test('11')).toBe(true);
+      expect(x.test(51).pass).toBe(true);
+      expect(y.test('11').pass).toBe(true);
     });
   });
 

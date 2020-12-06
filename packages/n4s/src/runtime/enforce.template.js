@@ -19,7 +19,7 @@ export default function bindTemplate(enforce) {
       return proxy;
     };
 
-    template.test = value => runLazyRules(rule, value);
+    template.test = value => runLazyRules(rule, value, {});
 
     return Object.assign(template, {
       [InternalIdentifier]: InternalIdentifier,

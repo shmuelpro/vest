@@ -34,12 +34,12 @@ describe('lazy enforcements', () => {
   });
 
   it('Should produce correct result when run', () => {
-    expect(enforce.isEmpty()[RUN_RULE]([])).toBe(true);
-    expect(enforce.isEmpty()[RUN_RULE]([1, 2, 3])).toBe(false);
-    expect(enforce.isNumeric()[RUN_RULE]('555')).toBe(true);
-    expect(enforce.greaterThan(10)[RUN_RULE](20)).toBe(true);
-    expect(enforce.greaterThan(20)[RUN_RULE](10)).toBe(false);
-    expect(enforce.greaterThan(10)[RUN_RULE](4)).toBe(false);
+    expect(enforce.isEmpty()[RUN_RULE]([]).pass).toBe(true);
+    expect(enforce.isEmpty()[RUN_RULE]([1, 2, 3]).pass).toBe(false);
+    expect(enforce.isNumeric()[RUN_RULE]('555').pass).toBe(true);
+    expect(enforce.greaterThan(10)[RUN_RULE](20).pass).toBe(true);
+    expect(enforce.greaterThan(20)[RUN_RULE](10).pass).toBe(false);
+    expect(enforce.greaterThan(10)[RUN_RULE](4).pass).toBe(false);
     const fn = jest.fn(() => true);
     enforce.extend({
       getArgs: fn,

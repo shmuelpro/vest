@@ -11,12 +11,12 @@ describe('runLazyRules', () => {
 
     it('Should return true when successful', () => {
       const res = runLazyRules({ test: () => true }, 'some_value');
-      expect(res).toBe(true);
+      expect(res.pass).toBe(true);
     });
 
     it('Should return true when failing', () => {
       const res = runLazyRules({ test: () => false }, 'some_value');
-      expect(res).toBe(false);
+      expect(res.pass).toBe(false);
     });
   });
 
@@ -37,7 +37,7 @@ describe('runLazyRules', () => {
       const rule_2 = { test: () => true };
       const rule_3 = { test: () => true };
       const res = runLazyRules([rule_1, rule_2, rule_3], 'some_value');
-      expect(res).toBe(true);
+      expect(res.pass).toBe(true);
     });
 
     it('Should return false when false', () => {
@@ -45,7 +45,7 @@ describe('runLazyRules', () => {
       const rule_2 = { test: () => false };
       const rule_3 = { test: () => false };
       const res = runLazyRules([rule_1, rule_2, rule_3], 'some_value');
-      expect(res).toBe(false);
+      expect(res.pass).toBe(false);
     });
   });
 });
