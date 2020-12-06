@@ -22,7 +22,8 @@ function isArrayOf(value, options, ruleChains) {
       const chainResult = runLazyRules(chain, plainValue[i], options);
       currentResult.extend(chainResult);
       if (chainResult.pass) {
-        result.setFailed(true);
+        currentResult.setFailed(false);
+        result.setFailed(false);
         break;
       }
     }

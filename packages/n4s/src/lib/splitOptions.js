@@ -18,7 +18,7 @@ function unknownArgsCount(args) {
     [options] = args.splice(-1)[0];
   }
 
-  return [options, args];
+  return [options].concat(args);
 }
 
 export default function splitOptions(rule, args) {

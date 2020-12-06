@@ -15,50 +15,48 @@ import withArgs from 'withArgs';
 export default function bindLazyRule(ruleName) {
   const registeredRules = [];
 
-  const addFn = () =>
-  {
-    
-      return withArgs(args => {
-        const rule = runtimeRules[ruleName];
+  const addFn = ruleName => {
+    return withArgs(args => {
+      const rule = runtimeRules[ruleName];
 
-        registeredRules.push(
-          setFnName(value => {
-            return rule.apply(null, [value].concat(splitOptions(rule, args)));
-          }, ruleName)
-        );
+      registeredRules.push(
+        setFnName(value => {
+          return rule.apply(null, [value].concat(splitOptions(rule, args)));
+        }, ruleName)
+      );
 
-        const returnvalue = genRuleProxy({}, addFn);
+      const returnvalue = genRuleProxy({}, addFn);
 
-        return Object.assign(returnvalue, {
-          [RUN_RULE]: (value, options = {}) => {
-            const result = new RuleResult(true);
-            for (const fn of registeredRules) {
-              try {
-                if (isCompound(fn)) {
-                  if (fn.name === optional.name) {
-                    result.extend(
-                      fn(Value.wrap([value.obj, value.key]), options)
-                    );
-                  } else {
-                    result.extend(fn(Value.wrap(value), options));
-                  }
+      return Object.assign(returnvalue, {
+        [RUN_RULE]: (value, options = {}) => {
+          const result = new RuleResult(true);
+          for (const fn of registeredRules) {
+            try {
+              if (isCompound(fn)) {
+                if (fn.name === optional.name) {
+                  result.extend(
+                    fn(Value.wrap([value.obj, value.key]), options)
+                  );
                 } else {
-                  result.extend(fn(Value.unwrap(value)));
+                  result.extend(fn(Value.wrap(value), options));
                 }
-
-                if (!result.pass) {
-                  return result;
-                }
-              } catch (e) {
-                return false;
+              } else {
+                result.extend(fn(Value.unwrap(value)));
               }
-            }
-            return result;
-          },
-          [InternalIdentifier]: InternalIdentifier,
-        });
-      });
-    };
 
-  return addFn();
+              if (!result.pass) {
+                return result;
+              }
+            } catch (e) {
+              return false;
+            }
+          }
+          return result;
+        },
+        [InternalIdentifier]: InternalIdentifier,
+      });
+    });
+  };
+
+  return addFn(ruleName);
 }
