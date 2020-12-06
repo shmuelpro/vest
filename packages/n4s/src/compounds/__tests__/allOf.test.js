@@ -5,12 +5,14 @@ describe('allOf validation', () => {
   describe('Base behavior', () => {
     it('Should fail when at least one rule fails', () => {
       expect(
-        allOf('test', {}, enforce.isString(), enforce.longerThan(10)).pass
+        enforce.allOf(enforce.isString(), enforce.longerThan(10)).test('test')
+          .pass
       ).toBe(false);
     });
-    it('Should succeed when all of the rules apply', () => {
+    it.only('Should succeed when all of the rules apply', () => {
       expect(
-        allOf('test', {}, enforce.isString(), enforce.longerThan(3)).pass
+        enforce.allOf(enforce.isString(), enforce.longerThan(3)).test('test')
+          .pass
       ).toBe(true);
     });
     it('Should pass when no rules are provided', () => {

@@ -1,3 +1,5 @@
+import splitOptions, { InternalIdentifier } from 'splitOptions';
+
 import { RUN_RULE } from 'enforceKeywords';
 import genRuleProxy from 'genRuleProxy';
 import isCompound from 'isCompound';
@@ -13,17 +15,15 @@ import withArgs from 'withArgs';
 export default function bindLazyRule(ruleName) {
   const registeredRules = [];
 
-  const addFn = fnName =>
+  const addFn = () =>
     withArgs(args => {
+      const rule = runtimeRules[ruleName];
+      const [ruleArgs, options] = splitOptions(rule, args);
+
       registeredRules.push(
-        setFnName(
-          (value, options) =>
-            runtimeRules[fnName].apply(
-              null,
-              [value].concat(options ? options : [], args)
-            ),
-          fnName
-        )
+        setFnName(value => {
+          return rule.apply(null, [value, options].concat(ruleArgs));
+        }, ruleName)
       );
 
       const returnvalue = genRuleProxy({}, addFn);
@@ -54,8 +54,9 @@ export default function bindLazyRule(ruleName) {
           }
           return result;
         },
+        [InternalIdentifier]: InternalIdentifier,
       });
     });
 
-  return addFn(ruleName);
+  return addFn();
 }

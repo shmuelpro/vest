@@ -33,6 +33,7 @@
       "proxySupported": ["./packages/n4s/src/lib/proxySupported.js"],
       "runLazyRules": ["./packages/n4s/src/lib/runLazyRules.js"],
       "runtimeRules": ["./packages/n4s/src/lib/runtimeRules.js"],
+      "splitOptions": ["./packages/n4s/src/lib/splitOptions.js"],
       "transformResult": ["./packages/n4s/src/lib/transformResult.js"],
       "rules": ["./packages/n4s/src/rules.js"],
       "endsWith": ["./packages/n4s/src/rules/endsWith.js"],
