@@ -1,41 +1,39 @@
 import enforce from 'enforce';
-import oneOf from 'oneOf';
 
 describe('OneOf validation', () => {
   describe('Base behavior', () => {
     it('Should fail when all rules fail', () => {
       expect(
-        oneOf('test', {}, enforce.isNumber(), enforce.isUndefined()).pass
+        enforce.oneOf(enforce.isNumber(), enforce.isUndefined()).test('test')
+          .pass
       ).toBe(false);
     });
     it('Should succeed when EXACTLY one rule applies', () => {
       expect(
-        oneOf(
-          5,
-          {},
-          enforce.isString(),
-          enforce.isNumber(),
-          enforce.isUndefined()
-        ).pass
+        enforce
+          .oneOf(enforce.isString(), enforce.isNumber(), enforce.isUndefined())
+          .test(5).pass
       ).toBe(true);
     });
     it('Should fail when more than one rule applies', () => {
       expect(
-        oneOf(5, {}, enforce.isNumber(), enforce.isNumber().greaterThan(3)).pass
+        enforce
+          .oneOf(enforce.isNumber(), enforce.isNumber().greaterThan(3))
+          .test(5).pass
       ).toBe(false);
     });
     it('Should succeed when rule chaining', () => {
       expect(
-        oneOf(
-          [1, 2, 3],
-          {},
-          enforce.isArray().isNotEmpty().longerThan(2),
-          enforce.isUndefined()
-        ).pass
+        enforce
+          .oneOf(
+            enforce.isArray().isNotEmpty().longerThan(2),
+            enforce.isUndefined()
+          )
+          .test([1, 2, 3]).pass
       ).toBe(true);
     });
     it('Should fail with no rules', () => {
-      expect(oneOf(5, {}).pass).toBe(false);
+      expect(enforce.oneOf().test(5).pass).toBe(false);
     });
   });
 
