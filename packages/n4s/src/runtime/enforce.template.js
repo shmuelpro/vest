@@ -1,3 +1,5 @@
+import { InternalIdentifier } from 'splitOptions';
+
 import runner from 'enforceRunner';
 import genRuleProxy from 'genRuleProxy';
 import runLazyRules from 'runLazyRules';
@@ -19,6 +21,8 @@ export default function bindTemplate(enforce) {
 
     template.test = value => runLazyRules(rule, value);
 
-    return template;
+    return Object.assign(template, {
+      [InternalIdentifier]: InternalIdentifier,
+    });
   });
 }

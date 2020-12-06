@@ -16,47 +16,49 @@ export default function bindLazyRule(ruleName) {
   const registeredRules = [];
 
   const addFn = () =>
-    withArgs(args => {
-      const rule = runtimeRules[ruleName];
-      const [ruleArgs, options] = splitOptions(rule, args);
+  {
+    
+      return withArgs(args => {
+        const rule = runtimeRules[ruleName];
 
-      registeredRules.push(
-        setFnName(value => {
-          return rule.apply(null, [value, options].concat(ruleArgs));
-        }, ruleName)
-      );
+        registeredRules.push(
+          setFnName(value => {
+            return rule.apply(null, [value].concat(splitOptions(rule, args)));
+          }, ruleName)
+        );
 
-      const returnvalue = genRuleProxy({}, addFn);
+        const returnvalue = genRuleProxy({}, addFn);
 
-      return Object.assign(returnvalue, {
-        [RUN_RULE]: (value, options = {}) => {
-          const result = new RuleResult(true);
-          for (const fn of registeredRules) {
-            try {
-              if (isCompound(fn)) {
-                if (fn.name === optional.name) {
-                  result.extend(
-                    fn(Value.wrap([value.obj, value.key]), options)
-                  );
+        return Object.assign(returnvalue, {
+          [RUN_RULE]: (value, options = {}) => {
+            const result = new RuleResult(true);
+            for (const fn of registeredRules) {
+              try {
+                if (isCompound(fn)) {
+                  if (fn.name === optional.name) {
+                    result.extend(
+                      fn(Value.wrap([value.obj, value.key]), options)
+                    );
+                  } else {
+                    result.extend(fn(Value.wrap(value), options));
+                  }
                 } else {
-                  result.extend(fn(Value.wrap(value), options));
+                  result.extend(fn(Value.unwrap(value)));
                 }
-              } else {
-                result.extend(fn(Value.unwrap(value)));
-              }
 
-              if (!result.pass) {
-                return result;
+                if (!result.pass) {
+                  return result;
+                }
+              } catch (e) {
+                return false;
               }
-            } catch (e) {
-              return false;
             }
-          }
-          return result;
-        },
-        [InternalIdentifier]: InternalIdentifier,
+            return result;
+          },
+          [InternalIdentifier]: InternalIdentifier,
+        });
       });
-    });
+    };
 
   return addFn();
 }

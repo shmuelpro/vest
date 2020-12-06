@@ -4,7 +4,8 @@ import { loose, shape } from 'shape';
 const hasTwoArgs = rule => [shape.name, loose.name].includes(rule.name);
 
 function twoArgs(args) {
-  return args.length === 1 ? args.concat({}) : args;
+  // this sounds like the right approach. We'll need to test it.
+  return args.length === 1 ? [{}].concat(args) : args.reverse();
 }
 
 function unknownArgsCount(args) {
@@ -17,7 +18,7 @@ function unknownArgsCount(args) {
     [options] = args.splice(-1)[0];
   }
 
-  return [args, options];
+  return [options, args];
 }
 
 export default function splitOptions(rule, args) {

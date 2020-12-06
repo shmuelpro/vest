@@ -9,14 +9,15 @@ describe('allOf validation', () => {
           .pass
       ).toBe(false);
     });
-    it.only('Should succeed when all of the rules apply', () => {
+    it('Should succeed when all of the rules apply', () => {
       expect(
-        enforce.allOf(enforce.isString(), enforce.longerThan(3)).test('test')
-          .pass
+        enforce
+          .allOf(/*enforce.isString() , */ enforce.longerThan(3))
+          .test('test').pass
       ).toBe(true);
     });
     it('Should pass when no rules are provided', () => {
-      expect(allOf(3, {}).pass).toBe(true);
+      expect(enforce.allOf().test(3).pass).toBe(true);
     });
   });
 
@@ -38,12 +39,12 @@ describe('allOf validation', () => {
       })
     );
 
-    it('Should validate allof the rules correctly', () => {
+    it('Should validate allof rules correctly', () => {
       enforce({
         id: 123,
         name: { first: 'Albert', last: 'Einstein' },
         disabled: true,
-      }).allOf(User /*, DisabledAccount*/);
+      }).allOf(User, DisabledAccount);
     });
 
     it('Should throw if one of the rules fail', () => {
